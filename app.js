@@ -79,10 +79,13 @@ app.use("/api/v1/users", userRouter);
 app.get("/api/v1/admin", verifyUserAuthorization, getAdminPage);
 
 connectDB().then(() => {
-  app.listen(process.env.SERVER_PORT, (err) => {
-    if (err) throw new Error();
-    console.log(
-      `Server is running on ${process.env.SERVER_URL}:${process.env.SERVER_PORT}`
-    );
-  });
+  app
+    .listen(process.env.SERVER_PORT, () => {
+      console.log(
+        `Server is running on ${process.env.SERVER_URL}:${process.env.SERVER_PORT}`
+      );
+    })
+    .on("error", (err) => {
+      console.error("Failed to start server:", err);
+    });
 });

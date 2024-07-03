@@ -25,6 +25,7 @@ export const signUpUser = async (req, res) => {
         accessToken: JWT.GetJWT({
           id: createdUser.id,
           username: createdUser.username,
+          tokenType: "AT",
         }),
       });
     }
@@ -46,7 +47,7 @@ export const logInUser = async (req, res) => {
     }
     const isMatch = await bcrypt.compare(password, existingUser.password);
     if (!isMatch) {
-      throw new Error("Wrong password");
+      throw new Error("Wrong password or username");
     }
     res.status(200).send({
       message: "Login successful!",
@@ -55,6 +56,7 @@ export const logInUser = async (req, res) => {
       accessToken: JWT.GetJWT({
         id: existingUser.id,
         username: existingUser.username,
+        tokenType: "AT",
       }),
     });
   } catch (error) {

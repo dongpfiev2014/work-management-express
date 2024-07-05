@@ -16,6 +16,7 @@ export const verifyUserAuthorization = async (req, res, next) => {
       const checkRole = existingUser.role.includes("admin");
       if (!checkRole) {
         throw new Error("You are not authorized to access this route");
+        res.redirect("/not-authorized");
       }
       next();
     }

@@ -5,7 +5,7 @@ import { JWT } from "../utils/getJsonWebToken.js";
 
 export const signUpUser = async (req, res) => {
   try {
-    const { username, password, role } = req.body;
+    const { username, password } = req.body;
     const existingUser = await UserModel.findOne({ username });
     if (existingUser) {
       throw new Error("Username existed");
@@ -15,7 +15,6 @@ export const signUpUser = async (req, res) => {
     const createdUser = await UserModel.create({
       username,
       password: hashPassword,
-      role,
     });
     if (createdUser) {
       res.status(201).send({

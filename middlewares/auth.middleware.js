@@ -13,10 +13,12 @@ export const verifyUserAuthorization = async (req, res, next) => {
     } else {
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
       const existingUser = await UserModel.findById(decodedToken._id);
+      if (!existingUser) {
+        throw new Error("Invalid user");
+      }
       const checkRole = existingUser.role.includes("admin");
       if (!checkRole) {
-        throw new Error("You are not authorized to access this route");
-        res.redirect("/not-authorized");
+        return res.redirect("/not-authorized");
       }
       next();
     }

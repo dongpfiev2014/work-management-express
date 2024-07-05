@@ -8,9 +8,9 @@ import {
   verifyUserAuthorization,
 } from "./middlewares/auth.middleware.js";
 import { getAdminPage } from "./controllers/user.controller.js";
+import cors from "cors";
 // import multer from "multer";
 // import bodyParser from "body-parser";
-// import cors from "cors";
 // import { v2 as cloudinary } from "cloudinary";
 
 dotenv.config();
@@ -22,7 +22,7 @@ dotenv.config();
 // });
 
 const app = express();
-// app.use(cors());
+app.use(cors());
 app.use(express.json());
 // const storage = multer.memoryStorage();
 // const upload = multer({ storage });

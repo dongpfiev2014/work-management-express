@@ -10,18 +10,21 @@ export const verifyUserAuthorization = async (req, res, next) => {
         success: false,
         message: "You are not authorized to access this route",
       });
-    } else {
-      const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-      const existingUser = await UserModel.findById(decodedToken._id);
-      if (!existingUser) {
-        throw new Error("Invalid user");
-      }
-      const checkRole = existingUser.role.includes("admin");
-      if (!checkRole) {
-        return res.redirect("/not-authorized");
-      }
-      next();
     }
+    const decodedToken = jwt.verify(token, process.env.JWT_ACCESS_SECRET_KEY);
+    const existingUser = await UserModel.findById(decodedToken._id);
+    if (!existingUser) {
+      return res.status(404).send({
+        data: null,
+        success: false,
+        message: "Invalid user",
+      });
+    }
+    const checkRole = existingUser.role.includes("admin");
+    if (!checkRole) {
+      return res.redirect("/not-authorized");
+    }
+    next();
   } catch (error) {
     res.status(500).send({
       data: null,
@@ -40,14 +43,17 @@ export const verifyUserAuthentication = async (req, res, next) => {
         success: false,
         message: "You are not authorized to access this route",
       });
-    } else {
-      const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-      const existingUser = await UserModel.findById(decodedToken._id);
-      if (!existingUser) {
-        throw new Error("Invalid user");
-      }
-      next();
     }
+    const decodedToken = jwt.verify(token, process.env.JWT_ACCESS_SECRET_KEY);
+    const existingUser = await UserModel.findById(decodedToken.id);
+    if (!existingUser) {
+      return res.status(404).send({
+        data: null,
+        success: false,
+        message: "User not found",
+      });
+    }
+    next();
   } catch (error) {
     res.status(500).send({
       data: null,

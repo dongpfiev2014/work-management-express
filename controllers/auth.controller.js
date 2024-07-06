@@ -68,7 +68,7 @@ export const logInUser = async (req, res) => {
       return res.status(401).send({
         data: null,
         success: false,
-        message: "Wrong password or username",
+        message: "Wrong email or password",
       });
     }
 

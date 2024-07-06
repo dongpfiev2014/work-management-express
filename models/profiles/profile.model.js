@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Collections from "../../database/collection.js";
-import ProfilesSchema from "./profile.schema.js";
+import ProfileSchema from "./profile.schema.js";
 
-const ProfilesModel = mongoose.model(Collections.PROFILES, ProfilesSchema);
+const ProfileModel = mongoose.model(Collections.PROFILES, ProfileSchema);
 
-export default ProfilesModel;
+export default ProfileModel;

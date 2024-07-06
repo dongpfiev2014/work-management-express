@@ -2,39 +2,45 @@ import UserModel from "../models/users/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { JWT } from "../utils/getJsonWebToken.js";
+import ProfileModel from "../models/profiles/profile.model.js";
 
 export const signUpUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    if (!email) throw new Error("email is required!");
-    if (!password) throw new Error("password is required!");
+    const { fullName, email, password } = req.body;
+    if (!fullName) throw new Error("Full Name is required!");
+    if (!email) throw new Error("Email is required!");
+    if (!password) throw new Error("Password is required!");
 
     const existingUser = await UserModel.findOne({ email: email });
     if (existingUser) {
       return res.status(409).send({
-        data: null,
+        message: "Email already exists",
         success: false,
-        message: "Username already exists",
+        data: null,
       });
     }
 
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
     const createdUser = await UserModel.create({
-      email,
+      email: email,
       password: hashPassword,
     });
 
-    const { password: _, ...userWithoutPassword } = createdUser.toObject();
+    const createdProfile = await ProfileModel.create({
+      fullName: fullName,
+      email: email,
+      userId: createdUser._id,
+    });
 
     if (createdUser) {
       res.status(201).send({
         message: "Register successful!",
         success: true,
-        data: userWithoutPassword,
+        data: createdProfile,
         accessToken: JWT.GetJWT({
           id: createdUser.id,
-          username: createdUser.username,
+          email: createdUser.email,
           tokenType: "AT",
         }),
       });
@@ -71,16 +77,15 @@ export const logInUser = async (req, res) => {
         message: "Wrong email or password",
       });
     }
-
-    const { password: _, ...userWithoutPassword } = existingUser.toObject();
+    const existingProfile = await ProfileModel.findOne({ email: email });
 
     res.status(200).send({
       message: "Login successful!",
       success: true,
-      data: userWithoutPassword,
+      data: existingProfile,
       accessToken: JWT.GetJWT({
         id: existingUser.id,
-        username: existingUser.username,
+        email: existingUser.email,
         tokenType: "AT",
       }),
     });
@@ -137,7 +142,6 @@ export const signOutUser = async (req, res) => {
         success: false,
       });
     }
-
     // await TokenModel.findOneAndDelete({ token });
 
     res.status(200).send({

@@ -1,12 +1,18 @@
 import mongoose from "mongoose";
-import { getTimestampsConfig } from "../../utils/timestamps";
+import { getTimestampsConfig } from "../../utils/timestamps.js";
 
-const ProfilesSchema = new mongoose.Schema(
+const ProfileSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
       required: true,
+      unique: true,
+    },
+    email: {
+      required: true,
+      type: String,
+      unique: true,
     },
     fullName: {
       type: String,
@@ -31,4 +37,4 @@ const ProfilesSchema = new mongoose.Schema(
   getTimestampsConfig()
 );
 
-export default ProfilesSchema;
+export default ProfileSchema;

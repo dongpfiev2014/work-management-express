@@ -7,7 +7,7 @@ export class JWT {
       tokenType,
     };
     const options = {
-      expiresIn: "2h",
+      expiresIn: "1m",
     };
     const token = jwt.sign(payload, process.env.JWT_ACCESS_SECRET_KEY, options);
     return token;

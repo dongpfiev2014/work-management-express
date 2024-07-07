@@ -25,6 +25,7 @@ export const signUpUser = async (req, res) => {
     const createdUser = await UserModel.create({
       email: email,
       password: hashPassword,
+      roles: "user",
     });
 
     const createdProfile = await ProfileModel.create({
@@ -108,22 +109,47 @@ export const fetchUser = async (req, res) => {
         data: null,
       });
     }
-    const decodedToken = jwt.verify(token, process.env.JWT_ACCESS_SECRET_KEY);
-    const existingUser = await UserModel.findById(decodedToken.id).select(
-      "-password"
-    );
-    if (!existingUser) {
-      return res.status(404).send({
-        message: "User not found",
+    try {
+      const decodedToken = jwt.verify(token, process.env.JWT_ACCESS_SECRET_KEY);
+      const existingUser = await UserModel.findById(decodedToken.id).select(
+        "-password"
+      );
+      if (!existingUser) {
+        return res.status(404).send({
+          message: "User not found",
+          success: false,
+          data: null,
+        });
+      }
+      res.status(200).send({
+        message: "User fetched successfully",
+        success: true,
+        data: existingUser,
+      });
+    } catch (error) {
+      if (error.name === "JsonWebTokenError") {
+        return res.status(401).send({
+          message: "Invalid token",
+          success: false,
+          data: null,
+        });
+      }
+
+      if (error.name === "TokenExpiredError") {
+        return res.status(401).send({
+          message: "Token expired",
+          success: false,
+          data: null,
+        });
+      }
+      // Handle other JWT errors or general server errors
+      console.error(error);
+      res.status(500).send({
+        message: "Internal server error",
         success: false,
         data: null,
       });
     }
-    res.status(200).send({
-      message: "User fetched successfully",
-      success: true,
-      data: existingUser,
-    });
   } catch (error) {
     res.status(500).send({
       message: error.message,

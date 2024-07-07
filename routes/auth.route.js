@@ -12,6 +12,6 @@ authRouter.post("/signup", signUpUser);
 authRouter.post("/login", logInUser);
 authRouter.get("/user", fetchUser);
 authRouter.post("/signout", signOutUser);
-authRouter.post("/refresh");
+authRouter.post("/refreshToken");
 
 export default authRouter;

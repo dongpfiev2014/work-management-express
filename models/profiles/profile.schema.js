@@ -9,6 +9,10 @@ const ProfileSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    userRole: {
+      type: String,
+      ref: "users",
+    },
     email: {
       required: true,
       type: String,

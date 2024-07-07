@@ -1,8 +1,8 @@
 import UserModel from "../models/users/user.model.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { JWT } from "../utils/getJsonWebToken.js";
 import ProfileModel from "../models/profiles/profile.model.js";
+import { verifyAccessToken } from "../utils/verifyJsonWebToken.js";
 
 export const signUpUser = async (req, res) => {
   try {
@@ -25,13 +25,13 @@ export const signUpUser = async (req, res) => {
     const createdUser = await UserModel.create({
       email: email,
       password: hashPassword,
-      roles: "user",
     });
 
     const createdProfile = await ProfileModel.create({
       fullName: fullName,
       email: email,
       userId: createdUser._id,
+      userRole: createdUser.userRole,
     });
 
     if (createdUser) {
@@ -39,7 +39,7 @@ export const signUpUser = async (req, res) => {
         message: "Register successful!",
         success: true,
         data: createdProfile,
-        accessToken: JWT.GetJWT({
+        accessToken: JWT.GenerateAccessToken({
           id: createdUser.id,
           email: createdUser.email,
           tokenType: "AT",
@@ -84,7 +84,7 @@ export const logInUser = async (req, res) => {
       message: "Login successful!",
       success: true,
       data: existingProfile,
-      accessToken: JWT.GetJWT({
+      accessToken: JWT.GenerateAccessToken({
         id: existingUser.id,
         email: existingUser.email,
         tokenType: "AT",
@@ -109,50 +109,30 @@ export const fetchUser = async (req, res) => {
         data: null,
       });
     }
-    try {
-      const decodedToken = jwt.verify(token, process.env.JWT_ACCESS_SECRET_KEY);
-      const existingUser = await UserModel.findById(decodedToken.id).select(
-        "-password"
-      );
-      if (!existingUser) {
-        return res.status(404).send({
-          message: "User not found",
-          success: false,
-          data: null,
-        });
-      }
-      res.status(200).send({
-        message: "User fetched successfully",
-        success: true,
-        data: existingUser,
-      });
-    } catch (error) {
-      if (error.name === "JsonWebTokenError") {
-        return res.status(401).send({
-          message: "Invalid token",
-          success: false,
-          data: null,
-        });
-      }
 
-      if (error.name === "TokenExpiredError") {
-        return res.status(401).send({
-          message: "Token expired",
-          success: false,
-          data: null,
-        });
-      }
-      // Handle other JWT errors or general server errors
-      console.error(error);
-      res.status(500).send({
-        message: "Internal server error",
+    const decodedToken = await verifyAccessToken(
+      token,
+      process.env.JWT_ACCESS_SECRET_KEY
+    );
+    const existingProfile = await ProfileModel.findOne({
+      userId: decodedToken.id,
+    });
+
+    if (!existingProfile) {
+      return res.status(404).send({
+        message: "User not found",
         success: false,
         data: null,
       });
     }
+    res.status(200).send({
+      message: "User fetched successfully",
+      success: true,
+      data: existingProfile,
+    });
   } catch (error) {
-    res.status(500).send({
-      message: error.message,
+    res.status(error.status || 500).send({
+      message: error.message || "Internal Server Error",
       success: false,
       data: null,
     });
@@ -173,6 +153,7 @@ export const signOutUser = async (req, res) => {
     res.status(200).send({
       message: "Logout successful",
       success: true,
+      data: null,
     });
   } catch (error) {
     res.status(500).send({

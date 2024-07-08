@@ -22,7 +22,19 @@ dotenv.config();
 // });
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: `${process.env.CLIENT_URL}:${process.env.CLIENT_PORT}`,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: [
+      "Origin",
+      "X-Requested-With",
+      "Content-Type",
+      "Authorization",
+    ],
+    credentials: true,
+  })
+);
 app.use(express.json());
 // const storage = multer.memoryStorage();
 // const upload = multer({ storage });

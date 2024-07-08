@@ -13,9 +13,10 @@ export class JWT {
     return token;
   };
 
-  static GenerateRefreshToken = ({ id, tokenType }) => {
+  static GenerateRefreshToken = ({ id, email, tokenType }) => {
     const payload = {
       id,
+      email,
       tokenType,
     };
     const options = {

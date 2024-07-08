@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import { JWT } from "../utils/getJsonWebToken.js";
 import ProfileModel from "../models/profiles/profile.model.js";
 import { verifyAccessToken } from "../utils/verifyJsonWebToken.js";
+import SessionModel from "../models/sessions/session.model.js";
+import { parse, serialize } from "cookie";
 
 export const signUpUser = async (req, res) => {
   try {
@@ -57,9 +59,12 @@ export const signUpUser = async (req, res) => {
 
 export const logInUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, geoLocationDetails } = req.body;
     if (!email) throw new Error("email is required!");
     if (!password) throw new Error("password is required!");
+    if (!geoLocationDetails) {
+      throw new Error("Geolocation details are required!");
+    }
 
     const existingUser = await UserModel.findOne({ email: email });
     if (!existingUser) {
@@ -79,16 +84,45 @@ export const logInUser = async (req, res) => {
       });
     }
     const existingProfile = await ProfileModel.findOne({ email: email });
+    const accessToken = JWT.GenerateAccessToken({
+      id: existingUser.id,
+      email: existingUser.email,
+      tokenType: "AT",
+    });
+    const refreshToken = JWT.GenerateRefreshToken({
+      id: existingUser.id,
+      email: existingUser.email,
+      tokenType: "RT",
+    });
+
+    //TODO Use bcrypt to hash the Refresh Token if you want it to be more secure
+
+    await SessionModel.findOneAndUpdate(
+      { userId: existingUser._id },
+      {
+        $push: {
+          ipDetails: { refreshToken: refreshToken, ...geoLocationDetails },
+        },
+      },
+      { new: true, upsert: true }
+    );
+
+    const serializedRefreshToken = serialize("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 60 * 10,
+      path: "/",
+    });
+
+    console.log(process.env.NODE_ENV);
+    res.setHeader("Set-Cookie", serializedRefreshToken);
 
     res.status(200).send({
       message: "Login successful!",
       success: true,
       data: existingProfile,
-      accessToken: JWT.GenerateAccessToken({
-        id: existingUser.id,
-        email: existingUser.email,
-        tokenType: "AT",
-      }),
+      accessToken: accessToken,
     });
   } catch (error) {
     res.status(500).send({
@@ -155,6 +189,19 @@ export const signOutUser = async (req, res) => {
       success: true,
       data: null,
     });
+  } catch (error) {
+    res.status(500).send({
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
+export const refreshToken = async (req, res) => {
+  try {
+    const cookies = parse(req.headers.cookie || ""); // Parse cookies từ header của request
+    const refreshToken = cookies.refreshToken;
+    res.status(200).json({ refreshToken });
   } catch (error) {
     res.status(500).send({
       message: error.message,

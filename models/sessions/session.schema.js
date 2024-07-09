@@ -9,15 +9,12 @@ const IpDetailsSchema = new mongoose.Schema(
     },
     country_code: {
       type: String,
-      required: true,
     },
     country_name: {
       type: String,
-      required: true,
     },
     city: {
       type: String,
-      required: true,
     },
     postal: {
       type: String,
@@ -36,7 +33,6 @@ const IpDetailsSchema = new mongoose.Schema(
     },
     state: {
       type: String,
-      required: true,
     },
   },
   getTimestampsConfig()

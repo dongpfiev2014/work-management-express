@@ -1,26 +1,36 @@
 import jwt from "jsonwebtoken";
 export class JWT {
-  static GenerateAccessToken = ({ id, email, tokenType }) => {
+  static GenerateAccessToken = ({
+    id,
+    email,
+    tokenType,
+    expiresIn = process.env.EXPIRES_IN_ACCESS,
+  }) => {
     const payload = {
       id,
       email,
       tokenType,
     };
     const options = {
-      expiresIn: "1m",
+      expiresIn,
     };
     const token = jwt.sign(payload, process.env.JWT_ACCESS_SECRET_KEY, options);
     return token;
   };
 
-  static GenerateRefreshToken = ({ id, email, tokenType }) => {
+  static GenerateRefreshToken = ({
+    id,
+    email,
+    tokenType,
+    expiresIn = process.env.EXPIRES_IN_REFRESH,
+  }) => {
     const payload = {
       id,
       email,
       tokenType,
     };
     const options = {
-      expiresIn: "10m",
+      expiresIn,
     };
     const token = jwt.sign(
       payload,

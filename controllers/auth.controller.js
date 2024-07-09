@@ -2,9 +2,12 @@ import UserModel from "../models/users/user.model.js";
 import bcrypt from "bcrypt";
 import { JWT } from "../utils/getJsonWebToken.js";
 import ProfileModel from "../models/profiles/profile.model.js";
-import { verifyAccessToken } from "../utils/verifyJsonWebToken.js";
+import {
+  verifyAccessToken,
+  verifyRefreshToken,
+} from "../utils/verifyJsonWebToken.js";
 import SessionModel from "../models/sessions/session.model.js";
-import { parse, serialize } from "cookie";
+import Cookies from "cookies";
 
 export const signUpUser = async (req, res) => {
   try {
@@ -101,22 +104,23 @@ export const logInUser = async (req, res) => {
       { userId: existingUser._id },
       {
         $push: {
-          ipDetails: { refreshToken: refreshToken, ...geoLocationDetails },
+          ipDetails: { refreshToken, ...geoLocationDetails },
         },
       },
       { new: true, upsert: true }
     );
-
-    const serializedRefreshToken = serialize("refreshToken", refreshToken, {
+    const expiresInRefresh = parseInt(process.env.EXPIRES_IN_COOKIE, 10);
+    const cookies = new Cookies(req, res, {
+      keys: [`${process.env.COOKIE_ENV}`],
+    });
+    cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 60 * 10,
+      maxAge: expiresInRefresh,
       path: "/",
+      signed: true,
     });
-
-    console.log(process.env.NODE_ENV);
-    res.setHeader("Set-Cookie", serializedRefreshToken);
 
     res.status(200).send({
       message: "Login successful!",
@@ -135,17 +139,16 @@ export const logInUser = async (req, res) => {
 
 export const fetchUser = async (req, res) => {
   try {
-    const token = req.headers.authorization.split(" ")[1];
-    if (!token) {
+    const accessToken = req.headers.authorization.split(" ")[1];
+    if (!accessToken) {
       res.status(401).send({
         message: "You are not authorized to access this route",
         success: false,
         data: null,
       });
     }
-
     const decodedToken = await verifyAccessToken(
-      token,
+      accessToken,
       process.env.JWT_ACCESS_SECRET_KEY
     );
     const existingProfile = await ProfileModel.findOne({
@@ -175,14 +178,35 @@ export const fetchUser = async (req, res) => {
 
 export const signOutUser = async (req, res) => {
   try {
-    const token = req.headers.authorization.split(" ")[1];
-    if (!token) {
-      return res.status(401).send({
-        message: "You are not authorized to access this route",
+    const cookies = new Cookies(req, res, {
+      keys: [`${process.env.COOKIE_ENV}`],
+    });
+    const refreshToken = cookies.get("refreshToken", { signed: true });
+    cookies.set("refreshToken", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 0,
+      path: "/",
+      signed: true,
+    });
+    if (!refreshToken) {
+      return res.status(403).send({
+        message: "No refresh token found",
         success: false,
       });
     }
-    // await TokenModel.findOneAndDelete({ token });
+    const decodedClientRT = await verifyRefreshToken(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET_KEY
+    );
+
+    await SessionModel.findOneAndUpdate(
+      { userId: decodedClientRT.id },
+      {
+        $pull: { ipDetails: { refreshToken: refreshToken } },
+      }
+    );
 
     res.status(200).send({
       message: "Logout successful",
@@ -190,8 +214,8 @@ export const signOutUser = async (req, res) => {
       data: null,
     });
   } catch (error) {
-    res.status(500).send({
-      message: error.message,
+    res.status(error.status || 500).send({
+      message: error.message || "Internal Server Error",
       success: false,
     });
   }
@@ -199,9 +223,78 @@ export const signOutUser = async (req, res) => {
 
 export const refreshToken = async (req, res) => {
   try {
-    const cookies = parse(req.headers.cookie || ""); // Parse cookies từ header của request
-    const refreshToken = cookies.refreshToken;
-    res.status(200).json({ refreshToken });
+    const geoLocationDetails = req.body;
+    const cookies = new Cookies(req, res, {
+      keys: [`${process.env.COOKIE_ENV}`],
+    });
+    const refreshToken = cookies.get("refreshToken", { signed: true });
+    if (!refreshToken) {
+      return res.status(403).send({
+        message: "No refresh token found",
+        success: false,
+      });
+    }
+    const decodedClientRT = await verifyRefreshToken(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET_KEY
+    );
+    if (!decodedClientRT || decodedClientRT.tokenType !== "RT") {
+      return res.status(401).send({
+        message: "Invalid refresh token",
+        success: false,
+      });
+    }
+    const existingSession = await SessionModel.findOne({
+      "ipDetails.refreshToken": refreshToken,
+    });
+
+    if (!existingSession) {
+      return res.status(401).send({
+        message: "Invalid refresh token",
+        success: false,
+      });
+    }
+
+    const newAccessToken = JWT.GenerateAccessToken({
+      id: decodedClientRT.id,
+      email: decodedClientRT.email,
+      tokenType: "AT",
+    });
+    const expiresIn = decodedClientRT.exp - Math.floor(Date.now() / 1000);
+    const newRefreshToken = JWT.GenerateRefreshToken({
+      id: decodedClientRT.id,
+      email: decodedClientRT.email,
+      tokenType: "RT",
+      expiresIn: `${expiresIn}s`,
+    });
+
+    cookies.set("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: expiresIn * 1000,
+      path: "/",
+      signed: true,
+    });
+
+    await SessionModel.updateOne(
+      { userId: decodedClientRT.id },
+      { $pull: { ipDetails: { refreshToken: refreshToken } } }
+    );
+    await SessionModel.updateOne(
+      { userId: decodedClientRT.id },
+      {
+        $push: {
+          ipDetails: { refreshToken: newRefreshToken, ...geoLocationDetails },
+        },
+      },
+      { new: true, upsert: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      accessToken: newAccessToken,
+    });
   } catch (error) {
     res.status(500).send({
       message: error.message,

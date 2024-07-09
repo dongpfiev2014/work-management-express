@@ -182,6 +182,12 @@ export const signOutUser = async (req, res) => {
       keys: [`${process.env.COOKIE_ENV}`],
     });
     const refreshToken = cookies.get("refreshToken", { signed: true });
+    if (!refreshToken) {
+      return res.status(403).send({
+        message: "No refresh token found",
+        success: false,
+      });
+    }
     cookies.set("refreshToken", "", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -190,12 +196,7 @@ export const signOutUser = async (req, res) => {
       path: "/",
       signed: true,
     });
-    if (!refreshToken) {
-      return res.status(403).send({
-        message: "No refresh token found",
-        success: false,
-      });
-    }
+
     const decodedClientRT = await verifyRefreshToken(
       refreshToken,
       process.env.JWT_REFRESH_SECRET_KEY

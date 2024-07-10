@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { getTimestampsConfig } from "../../utils/timestamps.js";
 
 const ProfileSchema = new mongoose.Schema(
   {
@@ -38,7 +37,10 @@ const ProfileSchema = new mongoose.Schema(
       type: String,
     },
   },
-  getTimestampsConfig()
+  {
+    // getTimestampsConfig()
+    timestamps: true,
+  }
 );
 
 export default ProfileSchema;

@@ -99,20 +99,33 @@ export const logInUser = async (req, res) => {
     });
 
     //TODO Use bcrypt to hash the Refresh Token if you want it to be more secure
+    const expiresInRefresh = parseInt(process.env.EXPIRES_IN_COOKIE, 10) * 1000;
+    const expiresAt = new Date(Date.now() + expiresInRefresh);
 
-    await SessionModel.findOneAndUpdate(
-      { userId: existingUser._id },
-      {
-        $push: {
-          ipDetails: { refreshToken, ...geoLocationDetails },
-        },
-      },
-      { new: true, upsert: true }
-    );
-    const expiresInRefresh = parseInt(process.env.EXPIRES_IN_COOKIE, 10);
+    await SessionModel.create({
+      userId: existingUser.id,
+      email: existingUser.email,
+      refreshToken: refreshToken,
+      expiresAt: expiresAt,
+      ipDetails: geoLocationDetails,
+    });
+
+    // Check and remove oldest session
+    const sessions = await SessionModel.find({
+      userId: existingUser._id,
+    })
+      .sort({ createdAt: -1 })
+      .skip(2);
+    if (sessions.length > 0) {
+      await SessionModel.deleteMany({
+        _id: { $in: sessions.map((session) => session._id) },
+      });
+    }
+
     const cookies = new Cookies(req, res, {
       keys: [`${process.env.COOKIE_ENV}`],
     });
+
     cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -197,17 +210,22 @@ export const signOutUser = async (req, res) => {
       signed: true,
     });
 
-    const decodedClientRT = await verifyRefreshToken(
-      refreshToken,
-      process.env.JWT_REFRESH_SECRET_KEY
-    );
+    let decodedClientRT;
+    //* Delete the invalid refresh token
+    try {
+      decodedClientRT = await verifyRefreshToken(
+        refreshToken,
+        process.env.JWT_REFRESH_SECRET_KEY
+      );
+    } catch (error) {
+      await SessionModel.findOneAndDelete({ userId: decodedClientRT.id });
+      return res.status(401).send({
+        message: "Invalid refresh token",
+        success: false,
+      });
+    }
 
-    await SessionModel.findOneAndUpdate(
-      { userId: decodedClientRT.id },
-      {
-        $pull: { ipDetails: { refreshToken: refreshToken } },
-      }
-    );
+    await SessionModel.findOneAndDelete({ userId: decodedClientRT.id });
 
     res.status(200).send({
       message: "Logout successful",
@@ -235,23 +253,41 @@ export const refreshToken = async (req, res) => {
         success: false,
       });
     }
-    const decodedClientRT = await verifyRefreshToken(
-      refreshToken,
-      process.env.JWT_REFRESH_SECRET_KEY
-    );
-    if (!decodedClientRT || decodedClientRT.tokenType !== "RT") {
+
+    let decodedClientRT;
+    //* Delete the invalid refresh token
+    try {
+      decodedClientRT = await verifyRefreshToken(
+        refreshToken,
+        process.env.JWT_REFRESH_SECRET_KEY
+      );
+    } catch (error) {
+      await SessionModel.updateOne(
+        { "ipDetails.refreshToken": refreshToken },
+        { $pull: { ipDetails: { refreshToken: refreshToken } } }
+      );
+      cookies.set("refreshToken", "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 0,
+        path: "/",
+        signed: true,
+      });
       return res.status(401).send({
         message: "Invalid refresh token",
         success: false,
       });
     }
+
+    // * Update the refresh token in DB
     const existingSession = await SessionModel.findOne({
-      "ipDetails.refreshToken": refreshToken,
+      refreshToken: refreshToken,
     });
 
     if (!existingSession) {
-      return res.status(401).send({
-        message: "Invalid refresh token",
+      return res.status(403).send({
+        message: "Login session expired due to more than 2 devices logged in!",
         success: false,
       });
     }
@@ -278,16 +314,12 @@ export const refreshToken = async (req, res) => {
       signed: true,
     });
 
-    await SessionModel.updateOne(
-      { userId: decodedClientRT.id },
-      { $pull: { ipDetails: { refreshToken: refreshToken } } }
-    );
-    await SessionModel.updateOne(
-      { userId: decodedClientRT.id },
+    await SessionModel.findOneAndUpdate(
+      { refreshToken: refreshToken },
       {
-        $push: {
-          ipDetails: { refreshToken: newRefreshToken, ...geoLocationDetails },
-        },
+        refreshToken: newRefreshToken,
+        expiresAt: new Date(Date.now() + expiresIn * 1000),
+        ipDetails: geoLocationDetails,
       },
       { new: true, upsert: true }
     );

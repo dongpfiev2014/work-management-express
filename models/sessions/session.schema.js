@@ -1,12 +1,7 @@
 import mongoose from "mongoose";
-import { getTimestampsConfig } from "../../utils/timestamps.js";
 
 const IpDetailsSchema = new mongoose.Schema(
   {
-    refreshToken: {
-      type: String,
-      required: true,
-    },
     country_code: {
       type: String,
     },
@@ -21,11 +16,9 @@ const IpDetailsSchema = new mongoose.Schema(
     },
     latitude: {
       type: Number,
-      required: true,
     },
     longitude: {
       type: Number,
-      required: true,
     },
     IPv4: {
       type: String,
@@ -35,7 +28,10 @@ const IpDetailsSchema = new mongoose.Schema(
       type: String,
     },
   },
-  getTimestampsConfig()
+  {
+    _id: false,
+  }
+  // getTimestampsConfig()
 );
 
 const SessionSchema = new mongoose.Schema(
@@ -45,15 +41,35 @@ const SessionSchema = new mongoose.Schema(
       ref: "users",
       required: true,
     },
-    ipDetails: [IpDetailsSchema],
+    email: {
+      type: String,
+      required: true,
+    },
+    refreshToken: {
+      type: String,
+      required: true,
+    },
+    ipDetails: {
+      type: [IpDetailsSchema],
+      default: [],
+    },
+    expiresAt: {
+      type: Date,
+      required: true,
+      index: {
+        expireAfterSeconds: 0,
+      },
+    },
   },
-  getTimestampsConfig()
+  // getTimestampsConfig()
+  { timestamps: true }
 );
 
-SessionSchema.post("findOneAndUpdate", async function (doc) {
-  if (doc.ipDetails.length > 2) {
-    doc.ipDetails = doc.ipDetails.slice(-2);
-    await doc.save();
-  }
-});
+// SessionSchema.post("findOneAndUpdate", async function (doc) {
+//   if (doc.ipDetails.length > 2) {
+//     doc.ipDetails = doc.ipDetails.slice(-2);
+//     await doc.save();
+//   }
+// });
+
 export default SessionSchema;

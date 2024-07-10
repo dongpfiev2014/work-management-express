@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { getTimestampsConfig } from "../../utils/timestamps.js";
 
 const UserSchema = new mongoose.Schema(
   {
@@ -18,7 +17,10 @@ const UserSchema = new mongoose.Schema(
       default: "user",
     },
   },
-  getTimestampsConfig()
+  {
+    // getTimestampsConfig()
+    timestamps: true,
+  }
 );
 
 export default UserSchema;

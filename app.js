@@ -9,17 +9,8 @@ import {
 } from "./middlewares/auth.middleware.js";
 import { getAdminPage } from "./controllers/user.controller.js";
 import cors from "cors";
-// import multer from "multer";
-// import bodyParser from "body-parser";
-// import { v2 as cloudinary } from "cloudinary";
 
 dotenv.config();
-
-// cloudinary.config({
-//   cloud_name: "dq4kbmkrf",
-//   api_key: "268696593414899",
-//   api_secret: process.env.CLOUDINARY_API_SECRET, // Click 'View Credentials' below to copy your API secret
-// });
 
 const app = express();
 app.use(
@@ -36,53 +27,6 @@ app.use(
   })
 );
 app.use(express.json());
-// const storage = multer.memoryStorage();
-// const upload = multer({ storage });
-
-// app.post("/api/v1/upload", upload.single("file"), (req, res) => {
-//   const file = req.file;
-//   console.log(file);
-//   try {
-//     if (!file) {
-//       throw new Error("File not found");
-//     }
-//     const dataUrl = `data:${file.mimetype};base64,${file.buffer.toString(
-//       "base64"
-//     )}`;
-//     const fileName = file.originalname.split(".")[0];
-//     console.log(dataUrl);
-//     console.log(fileName);
-
-//     cloudinary.uploader.upload(
-//       dataUrl,
-//       {
-//         public_id: fileName,
-//         resource_type: "auto",
-//         folder: "images",
-//       },
-//       (err, result) => {
-//         if (err) {
-//           console.log(err);
-//           throw new Error("Error uploading");
-//         }
-//         if (result) {
-//           console.log(result);
-//           res.status(200).send({
-//             data: file,
-//             message: "Uploaded successfully",
-//             dataUrl: result.secure_url,
-//           });
-//         }
-//       }
-//     );
-//   } catch (error) {
-//     res.status(500).send({
-//       data: null,
-//       success: false,
-//       message: error.message,
-//     });
-//   }
-// });
 
 app.use("/api/v1/auth", authRouter);
 

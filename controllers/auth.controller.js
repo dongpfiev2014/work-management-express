@@ -11,10 +11,14 @@ import Cookies from "cookies";
 
 export const signUpUser = async (req, res) => {
   try {
-    const { fullName, email, password } = req.body;
+    const { fullName, email, password, emailVerified, geoLocationDetails } =
+      req.body;
     if (!fullName) throw new Error("Full Name is required!");
     if (!email) throw new Error("Email is required!");
     if (!password) throw new Error("Password is required!");
+    if (!geoLocationDetails) {
+      throw new Error("Geolocation details are required!");
+    }
 
     const existingUser = await UserModel.findOne({ email: email });
     if (existingUser) {
@@ -37,20 +41,51 @@ export const signUpUser = async (req, res) => {
       email: email,
       userId: createdUser._id,
       userRole: createdUser.userRole,
+      emailVerified: emailVerified,
     });
 
-    if (createdUser) {
-      res.status(201).send({
-        message: "Register successful!",
-        success: true,
-        data: createdProfile,
-        accessToken: JWT.GenerateAccessToken({
-          id: createdUser.id,
-          email: createdUser.email,
-          tokenType: "AT",
-        }),
-      });
-    }
+    const accessToken = JWT.GenerateAccessToken({
+      id: createdUser.id,
+      email: createdUser.email,
+      tokenType: "AT",
+    });
+    const refreshToken = JWT.GenerateRefreshToken({
+      id: createdUser.id,
+      email: createdUser.email,
+      tokenType: "RT",
+    });
+
+    //TODO Use bcrypt to hash the Refresh Token if you want it to be more secure
+    const expiresInRefresh = parseInt(process.env.EXPIRES_IN_COOKIE, 10) * 1000;
+    const expiresAt = new Date(Date.now() + expiresInRefresh);
+
+    await SessionModel.create({
+      userId: createdUser.id,
+      email: createdUser.email,
+      refreshToken: refreshToken,
+      expiresAt: expiresAt,
+      ipDetails: geoLocationDetails,
+    });
+
+    const cookies = new Cookies(req, res, {
+      keys: [`${process.env.COOKIE_ENV}`],
+    });
+
+    cookies.set("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: expiresInRefresh,
+      path: "/",
+      signed: true,
+    });
+
+    res.status(200).send({
+      message: "Login successful!",
+      success: true,
+      data: createdProfile,
+      accessToken: accessToken,
+    });
   } catch (error) {
     res.status(500).send({
       data: null,
@@ -59,6 +94,8 @@ export const signUpUser = async (req, res) => {
     });
   }
 };
+
+export const signInWithGoogle = async (req, res) => {};
 
 export const logInUser = async (req, res) => {
   try {
@@ -87,6 +124,14 @@ export const logInUser = async (req, res) => {
       });
     }
     const existingProfile = await ProfileModel.findOne({ email: email });
+    if (!existingProfile.emailVerified) {
+      return res.status(403).send({
+        data: null,
+        success: false,
+        message: "Email is not verified",
+      });
+    }
+
     const accessToken = JWT.GenerateAccessToken({
       id: existingUser.id,
       email: existingUser.email,

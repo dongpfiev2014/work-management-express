@@ -16,6 +16,10 @@ const UserSchema = new mongoose.Schema(
       enum: ["admin", "user"],
       default: "user",
     },
+    providerId: {
+      type: String,
+      default: "",
+    },
   },
   {
     // getTimestampsConfig()

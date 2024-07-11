@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   fetchUser,
   logInUser,
+  logInWithGoogle,
   refreshToken,
   signOutUser,
   signUpUser,
@@ -10,6 +11,7 @@ import {
 const authRouter = Router();
 
 authRouter.post("/signup", signUpUser);
+authRouter.post("/logInWithGoogle", logInWithGoogle);
 authRouter.post("/login", logInUser);
 authRouter.get("/user", fetchUser);
 authRouter.post("/signout", signOutUser);

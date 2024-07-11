@@ -21,6 +21,10 @@ const ProfileSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
     avatar: {
       type: String,
     },

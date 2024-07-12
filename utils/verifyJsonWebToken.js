@@ -51,3 +51,29 @@ export const verifyRefreshToken = (token, secretKey) => {
     });
   });
 };
+
+export const verifyResetToken = (token, secretKey) => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, secretKey, (error, decodedToken) => {
+      if (error) {
+        if (error.name === "JsonWebTokenError") {
+          return reject({
+            status: 401,
+            message: "Invalid authenticated session",
+          });
+        }
+        if (error.name === "TokenExpiredError") {
+          return reject({
+            status: 401,
+            message: "Authenticated session has expired",
+          });
+        }
+        return reject({
+          status: 500,
+          message: "Internal server error",
+        });
+      }
+      resolve(decodedToken);
+    });
+  });
+};

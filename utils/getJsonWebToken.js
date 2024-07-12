@@ -39,4 +39,21 @@ export class JWT {
     );
     return token;
   };
+  static GenerateResetToken = ({
+    id,
+    email,
+    tokenType,
+    expiresIn = process.env.EXPIRES_IN_RESET,
+  }) => {
+    const payload = {
+      id,
+      email,
+      tokenType,
+    };
+    const options = {
+      expiresIn,
+    };
+    const token = jwt.sign(payload, process.env.JWT_RESET_SECRET_KEY, options);
+    return token;
+  };
 }

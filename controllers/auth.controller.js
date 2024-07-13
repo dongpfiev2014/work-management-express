@@ -126,9 +126,7 @@ export const logInWithGoogle = async (req, res) => {
     if (!existingUser) {
       const salt = await bcrypt.genSalt(10);
       const randomPassword = generateStrongPassword();
-      console.log(randomPassword);
       const hashPassword = await bcrypt.hash(randomPassword, salt);
-      console.log(hashPassword);
       existingUser = await UserModel.create({
         email: userInfo.email,
         password: hashPassword,

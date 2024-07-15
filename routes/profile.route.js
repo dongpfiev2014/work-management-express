@@ -4,8 +4,6 @@ import { updateProfile } from "../controllers/profile.controller.js";
 
 const profileRouter = Router();
 
-profileRouter.put(
-  "/profile/:id",
-  multerUpload.single("photoUrl"),
-  updateProfile
-);
+profileRouter.put("/:id", multerUpload.single("avatar"), updateProfile);
+
+export default profileRouter;

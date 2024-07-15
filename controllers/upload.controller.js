@@ -9,7 +9,6 @@ export const uploadFile = async (req, res) => {
       data: null,
     });
   }
-
   try {
     const result = await uploadToCloudinary(file, "images");
     res.status(200).send({

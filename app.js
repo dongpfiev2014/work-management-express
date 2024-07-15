@@ -9,6 +9,7 @@ import {
 } from "./middlewares/auth.middleware.js";
 import { getAdminPage } from "./controllers/user.controller.js";
 import cors from "cors";
+import profileRouter from "./routes/profile.route.js";
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use("/api/v1/auth", authRouter);
 
 app.use(verifyUserAuthentication);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/profile", profileRouter);
 app.get("/api/v1/admin", verifyUserAuthorization, getAdminPage);
 
 connectDB().then(() => {

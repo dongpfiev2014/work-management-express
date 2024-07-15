@@ -78,3 +78,15 @@ export const verifyUserAuthorization = async (req, res, next) => {
     });
   }
 };
+
+export const checkOwnership = (req, res, next) => {
+  if (req.user._id.toString() === req.params.userId) {
+    next();
+  } else {
+    res.status(403).send({
+      message: "You are not authorized to perform this action",
+      success: false,
+      data: null,
+    });
+  }
+};

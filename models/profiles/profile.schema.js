@@ -28,16 +28,35 @@ const ProfileSchema = new mongoose.Schema(
     avatar: {
       type: String,
     },
-    bio: {
+    companyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "companies",
+    },
+    companyName: {
+      type: String,
+    },
+    jobTitle: {
       type: String,
     },
     dateOfBirth: {
-      type: Date,
+      type: String,
+    },
+    address: {
+      type: String,
+    },
+    telephoneNumber: {
+      type: String,
+    },
+    gender: {
+      type: String,
     },
     nationality: {
       type: String,
     },
     education: {
+      type: String,
+    },
+    bio: {
       type: String,
     },
   },

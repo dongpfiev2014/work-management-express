@@ -133,22 +133,19 @@ export const logInWithGoogle = async (req, res) => {
         providerId: userInfo.providerData[0].providerId,
       });
     }
-    const existingProfile = await ProfileModel.findOneAndUpdate(
-      {
+    const existingProfile = await ProfileModel.findOne({
+      email: userInfo.email,
+    });
+    if (!existingProfile) {
+      await ProfileModel.create({
         email: userInfo.email,
-      },
-      {
         userId: existingUser._id,
         userRole: existingUser.userRole,
         fullName: userInfo.displayName,
         emailVerified: userInfo.emailVerified,
         avatar: userInfo.photoURL,
-      },
-      {
-        new: true,
-        upsert: true,
-      }
-    );
+      });
+    }
 
     const accessToken = JWT.GenerateAccessToken({
       id: existingUser.id,

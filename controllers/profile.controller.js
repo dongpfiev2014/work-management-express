@@ -42,28 +42,3 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
-
-export const fetchProfile = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const profile = await ProfileModel.findOne({ userId: id });
-    if (!profile) {
-      return res.status(404).send({
-        message: "Profile not found",
-        success: false,
-        data: null,
-      });
-    }
-    res.status(200).send({
-      message: "Profile fetched successfully",
-      success: true,
-      data: profile,
-    });
-  } catch (err) {
-    res.status(err.status || 500).send({
-      message: err.message || "Internal Server Error",
-      success: false,
-      data: null,
-    });
-  }
-};

@@ -28,10 +28,12 @@ const ProfileSchema = new mongoose.Schema(
     avatar: {
       type: String,
     },
-    companyId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "companies",
-    },
+    companies: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "companies",
+      },
+    ],
     companyName: {
       type: String,
     },

@@ -61,6 +61,17 @@ const ProfileSchema = new mongoose.Schema(
     bio: {
       type: String,
     },
+    role: [
+      {
+        type: String,
+        enum: ["manager", "employee"],
+      },
+    ],
+    position: [
+      {
+        type: String,
+      },
+    ],
   },
   {
     // getTimestampsConfig()

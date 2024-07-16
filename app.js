@@ -14,6 +14,8 @@ import profileRouter from "./routes/profile.route.js";
 import companyRouter from "./routes/company.route.js";
 import { Server } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
+import requestRouter from "./routes/request.route.js";
+import memberRouter from "./routes/member.route.js";
 
 dotenv.config();
 
@@ -55,6 +57,8 @@ app.use(verifyUserAuthentication);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/profile", profileRouter);
 app.use("/api/v1/company", companyRouter);
+app.use("/api/v1/request", requestRouter);
+app.use("/api/v1/members", memberRouter);
 app.get("/api/v1/admin", verifyUserAuthorization, getAdminPage);
 
 connectDB().then(() => {
@@ -88,30 +92,32 @@ connectDB().then(() => {
 // });
 
 io.on("connection", (socket) => {
-  console.log(`Client connected: ${socket.id}`);
+  // console.log(`Client connected: ${socket.id}`);
 
   socket.on("join-request", (data) => {
-    const { userId, organizationId, position, reason, role } = data;
+    const { userId, fullName, organizationId, position, reason, role, avatar } =
+      data;
     const joinRequest = {
       userId,
+      fullName,
       organizationId,
       position,
       reason,
       role,
+      avatar,
       id: uuidv4(),
     };
-    console.log(joinRequest);
+    socket.organizationId = organizationId;
     io.to("admin-room").emit("join-request", joinRequest);
   });
 
   socket.on("join-admin", (data) => {
-    console.log("An admin connected");
-    console.log(data);
-    socket.join("admins");
+    const { userId } = data;
+    socket.join("admin-room", { message: "Welcome bro" });
   });
 
   socket.on("approve-request", (data) => {
-    console.log("Request approved:", data);
+    // console.log("Request approved:", data);
 
     io.emit("request-approved", data);
   });

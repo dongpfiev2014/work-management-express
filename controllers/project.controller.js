@@ -1,5 +1,6 @@
 import { uploadToCloudinary } from "../config/cloudinaryConfig.js";
 import DepartmentModel from "../models/departments/department.model.js";
+import ProfileModel from "../models/profiles/profile.model.js";
 import ProjectModel from "../models/projects/project.model.js";
 
 export const createProject = async (req, res) => {
@@ -100,9 +101,15 @@ export const getMembers = async (req, res) => {
         data: null,
       });
     }
-    const fetchedMembers = await ProjectModel.find({
-        userId: 
-    });
+
+    const fetchedMembers = await ProfileModel.find({
+      userId: {
+        $in: [
+          ...existingDepartment.owners,
+          ...existingDepartment.memberAccesses,
+        ],
+      },
+    }).exec();
 
     return res.status(200).send({
       message: "Members fetched successfully",

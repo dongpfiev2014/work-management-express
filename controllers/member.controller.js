@@ -13,8 +13,8 @@ export const getAllMembers = async (req, res) => {
       });
     }
 
-    const members = await CompanyModel.findById(organizationId).exec();
-    if (!members) {
+    const company = await CompanyModel.findById(organizationId).exec();
+    if (!company) {
       return res.status(404).send({
         message: "Company not found",
         success: false,
@@ -23,7 +23,7 @@ export const getAllMembers = async (req, res) => {
     }
     const profiles = await ProfileModel.find({
       userId: {
-        $in: members.employees,
+        $in: [company.owner, ...company.employees],
       },
     }).exec();
 

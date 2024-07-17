@@ -16,6 +16,8 @@ import { Server } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
 import requestRouter from "./routes/request.route.js";
 import memberRouter from "./routes/member.route.js";
+import departmentRouter from "./routes/department.route.js";
+import projectRouter from "./routes/projects.route.js";
 
 dotenv.config();
 
@@ -59,6 +61,8 @@ app.use("/api/v1/profile", profileRouter);
 app.use("/api/v1/company", companyRouter);
 app.use("/api/v1/request", requestRouter);
 app.use("/api/v1/members", memberRouter);
+app.use("/api/v1/departments", departmentRouter);
+app.use("/api/v1/projects", projectRouter);
 app.get("/api/v1/admin", verifyUserAuthorization, getAdminPage);
 
 connectDB().then(() => {
@@ -123,6 +127,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log(`Clients disconnected: ${socket.id}`);
+    // console.log(`Clients disconnected: ${socket.id}`);
   });
 });

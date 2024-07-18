@@ -449,7 +449,7 @@ export const refreshToken = async (req, res) => {
         success: false,
       });
     }
-
+    //* You should update the expiresIn time of accessToken in the rest of RefreshToken if refreshToken is about to expire
     const newAccessToken = JWT.GenerateAccessToken({
       id: decodedClientRT.id,
       email: decodedClientRT.email,

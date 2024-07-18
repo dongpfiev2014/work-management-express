@@ -6,7 +6,7 @@ export const verifyUserAuthentication = async (req, res, next) => {
     const token =
       req.headers.authorization && req.headers.authorization.split(" ")[1];
     if (!token) {
-      res.status(401).send({
+      res.status(403).send({
         data: null,
         success: false,
         message: "You are not authorized to access this route",

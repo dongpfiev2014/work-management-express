@@ -37,9 +37,6 @@ const ProfileSchema = new mongoose.Schema(
     companyName: {
       type: String,
     },
-    jobTitle: {
-      type: String,
-    },
     dateOfBirth: {
       type: String,
     },
@@ -64,7 +61,7 @@ const ProfileSchema = new mongoose.Schema(
     role: [
       {
         type: String,
-        enum: ["manager", "employee"],
+        enum: ["manager", "employee", "owner"],
       },
     ],
     position: [

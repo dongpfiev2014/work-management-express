@@ -32,6 +32,7 @@ export const createCompany = async (req, res) => {
       await createdCompany.save();
     }
     existingProfile.companies.push(createdCompany._id);
+    existingProfile.role.push("owner");
     await existingProfile.save();
 
     return res.status(201).send({

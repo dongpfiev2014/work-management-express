@@ -75,6 +75,7 @@ export const fetchProjects = async (req, res) => {
       message: "Projects fetched successfully",
       success: true,
       data: fetchedProjects,
+      department: existingDepartment,
     });
   } catch (err) {
     res.status(err.status || 500).send({

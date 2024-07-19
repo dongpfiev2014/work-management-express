@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
-const ProjectSchema = new mongoose.Schema(
+const TaskSchema = new mongoose.Schema(
   {
-    projectName: {
+    taskName: {
       type: String,
       required: true,
     },
@@ -10,7 +10,12 @@ const ProjectSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    owner: {
+    assignedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
+    },
+    assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
       required: true,
@@ -20,15 +25,19 @@ const ProjectSchema = new mongoose.Schema(
       ref: "departments",
       required: true,
     },
-    organizationId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "companies",
-      required: true,
-    },
-    task: [],
-    projectImage: {
+    status: {
       type: String,
-      default: null,
+      enum: ["TO DO", "WORK IN PROGRESS", "UNDER REVIEW", "COMPLETED"],
+      default: "Pending",
+    },
+    priority: {
+      type: String,
+      enum: ["Important", "Urgent", "Critical", "Neither"],
+      default: "Medium",
+    },
+    dueDate: {
+      type: Date,
+      required: true,
     },
   },
   {
@@ -37,4 +46,4 @@ const ProjectSchema = new mongoose.Schema(
   }
 );
 
-export default ProjectSchema;
+export default TaskSchema;

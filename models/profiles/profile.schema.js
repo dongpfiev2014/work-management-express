@@ -69,6 +69,18 @@ const ProfileSchema = new mongoose.Schema(
         type: String,
       },
     ],
+    departmentId: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "departments",
+      },
+    ],
+    subordinates: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "profiles",
+      },
+    ],
   },
   {
     // getTimestampsConfig()

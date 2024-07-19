@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Collections from "../../database/collection.js";
-import ProjectSchema from "./project.schema.js";
+import TaskSchema from "./task.schema.js";
 
-const ProjectModel = mongoose.model(Collections.PROJECT, ProjectSchema);
+const TaskModel = mongoose.model(Collections.TASKS, TaskSchema);
 
-export default ProjectModel;
+export default TaskModel;

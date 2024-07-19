@@ -6,7 +6,7 @@ export const verifyUserAuthentication = async (req, res, next) => {
     const token =
       req.headers.authorization && req.headers.authorization.split(" ")[1];
     if (!token) {
-      res.status(403).send({
+      return res.status(403).send({
         data: null,
         success: false,
         message: "You are not authorized to access this route",
@@ -27,11 +27,13 @@ export const verifyUserAuthentication = async (req, res, next) => {
     req.user = existingUser;
     next();
   } catch (error) {
-    res.status(error.status || 500).send({
-      data: null,
-      success: false,
-      message: error.message || "Internal Server Error",
-    });
+    if (!res.headersSent) {
+      return res.status(error.status || 500).send({
+        data: null,
+        success: false,
+        message: error.message || "Internal Server Error",
+      });
+    }
   }
 };
 
@@ -40,7 +42,7 @@ export const verifyUserAuthorization = async (req, res, next) => {
     const token =
       req.headers.authorization && req.headers.authorization.split(" ")[1];
     if (!token) {
-      res.status(401).send({
+      return res.status(403).send({
         data: null,
         success: false,
         message: "You are not authorized to access this route",
@@ -71,7 +73,7 @@ export const verifyUserAuthorization = async (req, res, next) => {
     req.user = existingUser;
     next();
   } catch (error) {
-    res.status(error.status || 500).send({
+    return res.status(error.status || 500).send({
       message: error.message || "Internal Server Error",
       success: false,
       data: null,

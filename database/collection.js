@@ -7,6 +7,7 @@ const Collection = {
   DEPARTMENT: "departments",
   PROJECT: "projects",
   TASKS: "tasks",
+  TASKGROUPS: "taskGroups",
   NOTIFICATIONS: "notifications",
   COMMENTS: "comments",
 };

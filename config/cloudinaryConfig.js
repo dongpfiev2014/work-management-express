@@ -37,4 +37,35 @@ const uploadToCloudinary = (file, path, userId) => {
   });
 };
 
-export { uploadToCloudinary, multerUpload };
+const uploadMultiTypeToCloudinary = (file, path, userId) => {
+  return new Promise((resolve, reject) => {
+    const dataUrl = `data:${file.mimetype};base64,${file.buffer.toString(
+      "base64"
+    )}`;
+    const publicId = `${userId}_${file.originalname
+      .split(".")
+      .slice(0, -1)
+      .join(".")}`;
+    const fileExtension = file.originalname.split(".").pop();
+
+    cloudinary.uploader.upload(
+      dataUrl,
+      {
+        public_id: publicId,
+        resource_type: "auto",
+        folder: `WorkManagement/${path}`,
+        overwrite: true,
+        format: fileExtension,
+      },
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+  });
+};
+
+export { uploadMultiTypeToCloudinary, uploadToCloudinary, multerUpload };

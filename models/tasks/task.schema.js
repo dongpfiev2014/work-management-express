@@ -2,6 +2,16 @@ import mongoose from "mongoose";
 
 const TaskSchema = new mongoose.Schema(
   {
+    projectId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "departments",
+      required: true,
+    },
+    taskGroup: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "taskGroups",
+      required: true,
+    },
     taskName: {
       type: String,
       required: true,
@@ -20,11 +30,7 @@ const TaskSchema = new mongoose.Schema(
       ref: "users",
       required: true,
     },
-    departmentId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "departments",
-      required: true,
-    },
+
     status: {
       type: String,
       enum: ["TO DO", "WORK IN PROGRESS", "UNDER REVIEW", "COMPLETED"],
@@ -43,6 +49,11 @@ const TaskSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    attachments: [
+      {
+        type: String,
+      },
+    ],
   },
   {
     // getTimestampsConfig()

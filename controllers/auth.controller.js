@@ -354,7 +354,7 @@ export const signOutUser = async (req, res) => {
     });
     const refreshToken = cookies.get("refreshToken", { signed: true });
     if (!refreshToken) {
-      return res.status(403).send({
+      return res.status(401).send({
         message: "No refresh token found",
         success: false,
       });
@@ -406,7 +406,7 @@ export const refreshToken = async (req, res) => {
     });
     const refreshToken = cookies.get("refreshToken", { signed: true });
     if (!refreshToken) {
-      return res.status(403).send({
+      return res.status(401).send({
         message: "No refresh token found",
         success: false,
       });

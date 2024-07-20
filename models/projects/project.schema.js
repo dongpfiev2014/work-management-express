@@ -25,7 +25,6 @@ const ProjectSchema = new mongoose.Schema(
       ref: "companies",
       required: true,
     },
-    task: [],
     projectImage: {
       type: String,
       default: null,

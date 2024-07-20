@@ -22,3 +22,25 @@ export const getAllTasks = async (req, res) => {
     });
   }
 };
+
+export const createTaskGroup = async (req, res) => {
+  try {
+  } catch (err) {
+    res.status(err.status || 500).send({
+      message: err.message || "Internal Server Error",
+      success: false,
+      data: null,
+    });
+  }
+};
+
+export const createTask = async (req, res) => {
+  try {
+  } catch (err) {
+    res.status(err.status || 500).send({
+      message: err.message || "Internal Server Error",
+      success: false,
+      data: null,
+    });
+  }
+};

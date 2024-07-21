@@ -1,5 +1,6 @@
 import UserModel from "../models/users/user.model.js";
 import { verifyAccessToken } from "../utils/verifyJsonWebToken.js";
+import Cookies from "cookies";
 
 export const verifyUserAuthentication = async (req, res, next) => {
   try {
@@ -12,6 +13,18 @@ export const verifyUserAuthentication = async (req, res, next) => {
         message: "You are not authorized to access this route",
       });
     }
+
+    const cookies = new Cookies(req, res, {
+      keys: [`${process.env.COOKIE_ENV}`],
+    });
+    const refreshToken = cookies.get("refreshToken", { signed: true });
+    if (!refreshToken) {
+      return res.status(403).send({
+        message: "No refresh token found",
+        success: false,
+      });
+    }
+
     const decodedToken = await verifyAccessToken(
       token,
       process.env.JWT_ACCESS_SECRET_KEY

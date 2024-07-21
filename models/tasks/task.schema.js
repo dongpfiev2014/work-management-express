@@ -4,13 +4,16 @@ const TaskSchema = new mongoose.Schema(
   {
     projectId: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "projects",
+      required: true,
+    },
+    departmentId: {
+      type: mongoose.Schema.Types.ObjectId,
       ref: "departments",
       required: true,
     },
     taskGroup: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "taskGroups",
-      required: true,
+      type: String,
     },
     taskName: {
       type: String,
@@ -18,18 +21,19 @@ const TaskSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: true,
     },
     assignedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "profiles",
       required: true,
     },
-    assignedTo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
-      required: true,
-    },
+    assignedTo: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "profiles",
+        required: true,
+      },
+    ],
 
     status: {
       type: String,

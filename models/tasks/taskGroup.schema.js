@@ -8,7 +8,6 @@ const TaskGroupSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: true,
     },
     projectId: {
       type: mongoose.Schema.Types.ObjectId,

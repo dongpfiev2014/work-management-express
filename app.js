@@ -19,6 +19,7 @@ import memberRouter from "./routes/member.route.js";
 import departmentRouter from "./routes/department.route.js";
 import projectRouter from "./routes/projects.route.js";
 import taskRouter from "./routes/task.route.js";
+import commentRouter from "./routes/comment.route.js";
 
 dotenv.config();
 
@@ -65,6 +66,7 @@ app.use("/api/v1/members", memberRouter);
 app.use("/api/v1/departments", departmentRouter);
 app.use("/api/v1/projects", projectRouter);
 app.use("/api/v1/tasks", taskRouter);
+app.use("/api/v1/comments", commentRouter);
 app.get("/api/v1/admin", verifyUserAuthorization, getAdminPage);
 
 connectDB().then(() => {

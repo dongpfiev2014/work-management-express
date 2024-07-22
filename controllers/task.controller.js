@@ -329,19 +329,19 @@ export const personalTasks = async (req, res) => {
     tasks.forEach((task) => {
       // Tạo một object chứa thông tin task
       const taskItem = {
-        id: task._id,
+        _id: task._id,
         projectId: task.projectId,
-        department: task.departmentId,
+        departmentId: task.departmentId,
         taskGroup: task.taskGroup,
-        title: task.taskName,
-        content: task.description,
+        taskName: task.taskName,
+        description: task.description,
         dueDate: task.dueDate,
         status: task.status,
         priority: task.priority,
         completed: task.completed,
         attachments: task.attachments,
         assignedBy: task.assignedBy,
-        followers: task.assignedTo,
+        assignedTo: task.assignedTo,
       };
 
       // Sắp xếp task vào cột tương ứng

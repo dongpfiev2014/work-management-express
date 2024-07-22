@@ -58,6 +58,13 @@ const TaskSchema = new mongoose.Schema(
         type: String,
       },
     ],
+    comments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "comments",
+        required: true,
+      },
+    ],
   },
   {
     // getTimestampsConfig()

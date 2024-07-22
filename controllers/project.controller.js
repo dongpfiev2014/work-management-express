@@ -68,13 +68,49 @@ export const fetchProjects = async (req, res) => {
         data: null,
       });
     }
-    const fetchedProjects = await ProjectModel.find({
+    const fetchedProjects2 = await ProjectModel.find({
       departmentId: existingDepartment._id,
-    });
+    })
+      .populate("owner")
+      .exec();
+
+    // const fetchedProjects = await ProjectModel.aggregate([
+    //   {
+    //     $match: { departmentId: existingDepartment._id },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "profiles",
+    //       localField: "owner",
+    //       foreignField: "userId",
+    //       as: "ownerProfile",
+    //     },
+    //   },
+    //   {
+    //     $unwind: "$ownerProfile",
+    //   },
+    //   {
+    //     $project: {
+    //       _id: 1,
+    //       projectName: 1,
+    //       description: 1,
+    //       departmentId: 1,
+    //       organizationId: 1,
+    //       projectImage: 1,
+    //       owner: {
+    //         _id: "$ownerProfile._id",
+    //         fullName: "$ownerProfile.fullName",
+    //         email: "$ownerProfile.email",
+    //         avatar: "$ownerProfile.avatar",
+    //       },
+    //     },
+    //   },
+    // ]);
+
     return res.status(200).send({
       message: "Projects fetched successfully",
       success: true,
-      data: fetchedProjects,
+      data: fetchedProjects2,
       department: existingDepartment,
     });
   } catch (err) {

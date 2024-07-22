@@ -12,7 +12,7 @@ const ProjectSchema = new mongoose.Schema(
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "profiles",
       required: true,
     },
     departmentId: {

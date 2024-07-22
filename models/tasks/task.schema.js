@@ -65,4 +65,20 @@ const TaskSchema = new mongoose.Schema(
   }
 );
 
+TaskSchema.pre("save", function (next) {
+  if (this.isModified("status") && this.status === "COMPLETED") {
+    this.completed = true;
+  } else this.completed = false;
+  next();
+});
+
+// Middleware pre-update to handle the case when using findOneAndUpdate
+TaskSchema.pre("findOneAndUpdate", function (next) {
+  const update = this.getUpdate();
+  if (update.status === "COMPLETED") {
+    update.completed = true;
+  } else update.completed = false;
+  next();
+});
+
 export default TaskSchema;

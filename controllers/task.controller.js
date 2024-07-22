@@ -26,7 +26,6 @@ const getEmailObjectIds = async (emails) => {
 export const fetchAllTasks = async (req, res) => {
   try {
     const { projectId, departmentId } = req.params;
-    console.log(projectId, departmentId);
 
     if (!projectId || !departmentId) {
       throw new Error("Missing required parameters");
@@ -54,7 +53,6 @@ export const fetchAllTasks = async (req, res) => {
     }).exec();
 
     const groupNames = taskGroups.map((group) => group.groupName);
-    console.log(groupNames);
 
     const tasks = await TaskModel.aggregate([
       { $match: { taskGroup: { $in: groupNames } } },
@@ -375,7 +373,6 @@ export const updatePersonalTasks = async (req, res) => {
   try {
     const { taskId } = req.params;
     const newStatus = req.body.status;
-    console.log(taskId, newStatus);
 
     if (!taskId || !newStatus) {
       return res.status(400).send({
@@ -403,6 +400,48 @@ export const updatePersonalTasks = async (req, res) => {
     const task = await TaskModel.findByIdAndUpdate(
       taskId,
       { status: actualStatus },
+      { new: true }
+    )
+      .populate("assignedBy", "fullName email")
+      .populate("assignedTo", "fullName email")
+      .populate("projectId", "projectName")
+      .populate("departmentId", "departmentName");
+
+    if (!task) {
+      return res.status(404).send({
+        message: "Task not found",
+        success: false,
+      });
+    }
+
+    return res.status(200).send({
+      message: "Task updated successfully",
+      success: true,
+      data: task,
+    });
+  } catch (err) {
+    res.status(err.status || 500).send({
+      message: err.message || "Internal Server Error",
+      success: false,
+    });
+  }
+};
+
+export const updateStatusTasks = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const newStatus = req.body.status;
+
+    if (!taskId || !newStatus) {
+      return res.status(400).send({
+        message: "Task ID and new status are required",
+        success: false,
+      });
+    }
+
+    const task = await TaskModel.findByIdAndUpdate(
+      taskId,
+      { status: newStatus },
       { new: true }
     )
       .populate("assignedBy", "fullName email")

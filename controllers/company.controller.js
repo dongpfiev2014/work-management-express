@@ -1,5 +1,6 @@
 import { uploadToCloudinary } from "../config/cloudinaryConfig.js";
 import CompanyModel from "../models/companies/company.model.js";
+import DepartmentModel from "../models/departments/department.model.js";
 import ProfileModel from "../models/profiles/profile.model.js";
 
 export const createCompany = async (req, res) => {
@@ -59,6 +60,11 @@ export const fetchCompanies = async (req, res) => {
     const companies = await CompanyModel.find({
       $or: [{ owner: userId }, { employees: { $in: [userId] } }],
     });
+
+    const allDepartments = await DepartmentModel.find({
+      organizationId: companies[0]._id,
+    });
+    companies[0].department = allDepartments;
 
     return res.status(200).send({
       message: "Companies fetched successfully",

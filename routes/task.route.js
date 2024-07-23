@@ -12,14 +12,15 @@ import { uploadMultipleTaskFiles } from "../controllers/upload.controller.js";
 
 const taskRouter = Router();
 
-taskRouter.get("/:departmentId/:projectId", fetchAllTasks);
-taskRouter.post("/taskGroups/:projectId", createTaskGroup);
-taskRouter.post("/:departmentId/:projectId", createTask);
 taskRouter.post(
-  "/uploadMultiTaskFile/:projectId",
+  "/upload/MultiTaskFile/:projectId",
   multerUpload.array("multiTaskFile", 10),
   uploadMultipleTaskFiles
 );
+
+taskRouter.get("/:departmentId/:projectId", fetchAllTasks);
+taskRouter.post("/taskGroups/:projectId", createTaskGroup);
+taskRouter.post("/:departmentId/:projectId", createTask);
 taskRouter.get("/personalTask", personalTasks);
 taskRouter.put("/:taskId", updatePersonalTasks);
 taskRouter.put("/status/:taskId", updateStatusTasks);

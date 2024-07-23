@@ -40,10 +40,14 @@ export const createProject = async (req, res) => {
     existingDepartment.projects.push(createdProject._id);
     await existingDepartment.save();
 
+    const populatedProject = await ProjectModel.findById(
+      createdProject._id
+    ).populate("owner");
+
     return res.status(200).send({
       message: "Project created successfully",
       success: true,
-      data: createdProject,
+      data: populatedProject,
     });
   } catch (err) {
     res.status(err.status || 500).send({

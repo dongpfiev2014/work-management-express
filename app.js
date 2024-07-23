@@ -29,7 +29,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: `${process.env.CLIENT_URL}:${process.env.CLIENT_PORT}`,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: [
       "Origin",
       "X-Requested-With",
@@ -44,7 +44,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: `${process.env.CLIENT_URL}:${process.env.CLIENT_PORT}`,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: [
       "Origin",
       "X-Requested-With",

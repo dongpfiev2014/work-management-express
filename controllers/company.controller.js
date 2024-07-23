@@ -8,7 +8,7 @@ export const createCompany = async (req, res) => {
     const { userId } = req.params;
     const newCompanyData = JSON.parse(req.body.newCompanyData);
     const file = req.file;
-    if (!userId || !newCompanyData || !file) {
+    if (!userId || !newCompanyData) {
       throw new Error("Missing required parameters");
     }
     const existingProfile = await ProfileModel.findOne({ userId: userId });

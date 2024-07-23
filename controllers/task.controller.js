@@ -297,6 +297,7 @@ export const personalTasks = async (req, res) => {
           priority: 1,
           completed: 1,
           attachments: 1,
+          comments: 1,
           assignedBy: "$assignedByProfile",
           assignedTo: "$assignedToProfiles",
         },
@@ -340,6 +341,7 @@ export const personalTasks = async (req, res) => {
         priority: task.priority,
         completed: task.completed,
         attachments: task.attachments,
+        comments: task.comments,
         assignedBy: task.assignedBy,
         assignedTo: task.assignedTo,
       };

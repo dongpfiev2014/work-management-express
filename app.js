@@ -72,12 +72,12 @@ app.get("/api/v1/admin", verifyUserAuthorization, getAdminPage);
 connectDB().then(() => {
   server
     .listen(process.env.SERVER_PORT, () => {
-      console.log(
-        `Server is running on ${process.env.SERVER_URL}:${process.env.SERVER_PORT}`
-      );
+      // console.log(
+      //   `Server is running on ${process.env.SERVER_URL}:${process.env.SERVER_PORT}`
+      // );
     })
     .on("error", (err) => {
-      console.error("Failed to start server:", err);
+      // console.error("Failed to start server:", err);
     });
 });
 

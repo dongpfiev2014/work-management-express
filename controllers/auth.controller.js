@@ -230,7 +230,7 @@ export const logInUser = async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, existingUser.password);
     if (!isMatch) {
-      return res.status(401).send({
+      return res.status(400).send({
         data: null,
         success: false,
         message: "Wrong email or password",
@@ -300,10 +300,10 @@ export const logInUser = async (req, res) => {
       accessToken: accessToken,
     });
   } catch (error) {
-    res.status(500).send({
+    res.status(error.status || 500).send({
       data: null,
       success: false,
-      message: error.message,
+      message: error.message || "Internal Server Error",
     });
   }
 };
@@ -535,10 +535,10 @@ export const forgotPassword = async (req, res) => {
 
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
-        console.log("Error sending email:", error);
+        // console.log("Error sending email:", error);
         throw new Error("Failed to send reset password email");
       } else {
-        console.log("Reset email sent:", info.response);
+        // console.log("Reset email sent:", info.response);
         res.status(200).send({
           message: `Reset password link sent to your email: ${existingUser.email}`,
           success: true,
@@ -562,7 +562,7 @@ export const resetPassword = async (req, res) => {
       resetToken,
       process.env.JWT_RESET_SECRET_KEY
     );
-    console.log(resetId, decodedResetToken.id);
+
     if (!decodedResetToken || resetId !== decodedResetToken.id) {
       return res.status(401).send({
         message: "The user not found or the authenticated session has expired",

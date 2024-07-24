@@ -76,7 +76,7 @@ export const signUpUser = async (req, res) => {
 
     cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production" ? true : false,
       sameSite: "none",
       maxAge: expiresInRefresh,
       path: "/",
@@ -188,7 +188,7 @@ export const logInWithGoogle = async (req, res) => {
 
     cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production" ? true : false,
       sameSite: "none",
       maxAge: expiresInRefresh,
       path: "/",
@@ -286,7 +286,7 @@ export const logInUser = async (req, res) => {
 
     cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production" ? true : false,
       sameSite: "none",
       maxAge: expiresInRefresh,
       path: "/",
@@ -361,7 +361,7 @@ export const signOutUser = async (req, res) => {
     }
     cookies.set("refreshToken", "", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production" ? true : false,
       sameSite: "none",
       maxAge: 0,
       path: "/",
@@ -426,7 +426,7 @@ export const refreshToken = async (req, res) => {
       );
       cookies.set("refreshToken", "", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: process.env.NODE_ENV === "production" ? true : false,
         sameSite: "none",
         maxAge: 0,
         path: "/",
@@ -465,7 +465,7 @@ export const refreshToken = async (req, res) => {
 
     cookies.set("refreshToken", newRefreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production" ? true : false,
       sameSite: "none",
       maxAge: expiresIn * 1000,
       path: "/",

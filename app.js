@@ -69,7 +69,7 @@ app.use("/api/v1/tasks", taskRouter);
 app.use("/api/v1/comments", commentRouter);
 app.get("/api/v1/admin", verifyUserAuthorization, getAdminPage);
 
-const PORT = process.env.SERVER_PORT || 3000;
+const PORT = process.env.SERVER_PORT;
 connectDB().then(() => {
   server
     .listen(PORT, () => {

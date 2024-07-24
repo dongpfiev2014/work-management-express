@@ -70,14 +70,11 @@ app.use("/api/v1/comments", commentRouter);
 app.get("/api/v1/admin", verifyUserAuthorization, getAdminPage);
 
 const port = process.env.PORT || 4000;
+
 connectDB().then(() => {
-  server
-    .listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    })
-    .on("error", (err) => {
-      // console.error("Failed to start server:", err);
-    });
+  server.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
 });
 
 // Socket.io events

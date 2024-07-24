@@ -71,12 +71,19 @@ app.get("/api/v1/admin", verifyUserAuthorization, getAdminPage);
 
 const port = process.env.PORT || 4000;
 
-connectDB().then(() => {
-  server.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+connectDB()
+  .then(() => {
+    server
+      .listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+      })
+      .on("error", (err) => {
+        console.error("Failed to start server:", err);
+      });
+  })
+  .catch((err) => {
+    console.error("Failed to connect to the database:", err);
   });
-});
-
 // Socket.io events
 
 // app.post("/api/v1/notifications/join-request", (req, res) => {

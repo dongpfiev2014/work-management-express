@@ -69,13 +69,11 @@ app.use("/api/v1/tasks", taskRouter);
 app.use("/api/v1/comments", commentRouter);
 app.get("/api/v1/admin", verifyUserAuthorization, getAdminPage);
 
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 connectDB().then(() => {
   server
-    .listen(PORT, () => {
-      // console.log(
-      //   `Server is running on ${process.env.SERVER_URL}:${process.env.SERVER_PORT}`
-      // );
+    .listen(port, () => {
+      console.log(`Server is running on port ${port}`);
     })
     .on("error", (err) => {
       // console.error("Failed to start server:", err);

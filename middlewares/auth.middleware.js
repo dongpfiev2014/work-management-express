@@ -16,6 +16,7 @@ export const verifyUserAuthentication = async (req, res, next) => {
 
     const cookies = new Cookies(req, res, {
       keys: [`${process.env.COOKIE_ENV}`],
+      secure: process.env.NODE_ENV === "production" ? true : false,
     });
     const refreshToken = cookies.get("refreshToken", { signed: true });
     if (!refreshToken) {

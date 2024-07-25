@@ -72,6 +72,7 @@ export const signUpUser = async (req, res) => {
 
     const cookies = new Cookies(req, res, {
       keys: [`${process.env.COOKIE_ENV}`],
+      secure: process.env.NODE_ENV === "production" ? true : false,
     });
 
     cookies.set("refreshToken", refreshToken, {
@@ -184,6 +185,7 @@ export const logInWithGoogle = async (req, res) => {
 
     const cookies = new Cookies(req, res, {
       keys: [`${process.env.COOKIE_ENV}`],
+      secure: process.env.NODE_ENV === "production" ? true : false,
     });
 
     cookies.set("refreshToken", refreshToken, {
@@ -282,6 +284,7 @@ export const logInUser = async (req, res) => {
 
     const cookies = new Cookies(req, res, {
       keys: [`${process.env.COOKIE_ENV}`],
+      secure: process.env.NODE_ENV === "production" ? true : false,
     });
 
     cookies.set("refreshToken", refreshToken, {
@@ -351,7 +354,9 @@ export const signOutUser = async (req, res) => {
   try {
     const cookies = new Cookies(req, res, {
       keys: [`${process.env.COOKIE_ENV}`],
+      secure: process.env.NODE_ENV === "production" ? true : false,
     });
+
     const refreshToken = cookies.get("refreshToken", { signed: true });
     if (!refreshToken) {
       return res.status(401).send({
@@ -403,6 +408,7 @@ export const refreshToken = async (req, res) => {
     const geoLocationDetails = req.body;
     const cookies = new Cookies(req, res, {
       keys: [`${process.env.COOKIE_ENV}`],
+      secure: process.env.NODE_ENV === "production" ? true : false,
     });
     const refreshToken = cookies.get("refreshToken", { signed: true });
     if (!refreshToken) {

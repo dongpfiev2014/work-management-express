@@ -3,6 +3,7 @@ import { verifyAccessToken } from "../utils/verifyJsonWebToken.js";
 import Cookies from "cookies";
 
 export const verifyUserAuthentication = async (req, res, next) => {
+  console.log("hhahah");
   try {
     const token =
       req.headers.authorization && req.headers.authorization.split(" ")[1];
@@ -19,6 +20,7 @@ export const verifyUserAuthentication = async (req, res, next) => {
       secure: process.env.NODE_ENV === "production" ? true : false,
     });
     const refreshToken = cookies.get("refreshToken", { signed: true });
+
     if (!refreshToken) {
       return res.status(403).send({
         message: "No refresh token found",

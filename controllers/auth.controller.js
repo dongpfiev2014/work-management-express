@@ -77,7 +77,7 @@ export const signUpUser = async (req, res) => {
     cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production" ? true : false,
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: expiresInRefresh,
       path: "/",
       signed: true,
@@ -90,10 +90,10 @@ export const signUpUser = async (req, res) => {
       accessToken: accessToken,
     });
   } catch (error) {
-    res.status(500).send({
+    res.status(error.status || 500).send({
       data: null,
       success: false,
-      message: error.message,
+      message: error.message || "Internal Server Error",
     });
   }
 };
@@ -189,7 +189,7 @@ export const logInWithGoogle = async (req, res) => {
     cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production" ? true : false,
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: expiresInRefresh,
       path: "/",
       signed: true,
@@ -202,10 +202,10 @@ export const logInWithGoogle = async (req, res) => {
       accessToken: accessToken,
     });
   } catch (error) {
-    res.status(500).send({
-      message: error.message,
-      success: false,
+    res.status(error.status || 500).send({
       data: null,
+      success: false,
+      message: error.message || "Internal Server Error",
     });
   }
 };
@@ -287,7 +287,7 @@ export const logInUser = async (req, res) => {
     cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production" ? true : false,
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: expiresInRefresh,
       path: "/",
       signed: true,
@@ -362,7 +362,7 @@ export const signOutUser = async (req, res) => {
     cookies.set("refreshToken", "", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production" ? true : false,
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 0,
       path: "/",
       signed: true,
@@ -427,7 +427,7 @@ export const refreshToken = async (req, res) => {
       cookies.set("refreshToken", "", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production" ? true : false,
-        sameSite: "none",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         maxAge: 0,
         path: "/",
         signed: true,
@@ -466,7 +466,7 @@ export const refreshToken = async (req, res) => {
     cookies.set("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production" ? true : false,
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: expiresIn * 1000,
       path: "/",
       signed: true,
@@ -487,9 +487,10 @@ export const refreshToken = async (req, res) => {
       accessToken: newAccessToken,
     });
   } catch (error) {
-    res.status(500).send({
-      message: error.message,
+    res.status(error.status || 500).send({
+      data: null,
       success: false,
+      message: error.message || "Internal Server Error",
     });
   }
 };

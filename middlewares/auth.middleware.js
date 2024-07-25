@@ -38,6 +38,8 @@ export const verifyUserAuthentication = async (req, res, next) => {
         message: "User not found",
       });
     }
+
+    console.log("accessToken:", token, "refreshToken", refreshToken);
     req.user = existingUser;
     next();
   } catch (error) {

@@ -406,11 +406,13 @@ export const signOutUser = async (req, res) => {
 export const refreshToken = async (req, res) => {
   try {
     const geoLocationDetails = req.body;
+    console.log("Get refreshToken");
     const cookies = new Cookies(req, res, {
       keys: [`${process.env.COOKIE_ENV}`],
       secure: process.env.NODE_ENV === "production" ? true : false,
     });
     const refreshToken = cookies.get("refreshToken", { signed: true });
+    console.log("refreshToken");
     if (!refreshToken) {
       return res.status(403).send({
         message: "No refresh token found",

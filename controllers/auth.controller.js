@@ -536,7 +536,7 @@ export const forgotPassword = async (req, res) => {
       <p>Dear ${existingUser.fullName},</p><br>
       <p>You have requested to reset your password.</p>
       <p>Please click the following link to reset your password:</p><br>
-      <p><a href="http://localhost:3000/reset-password/${existingUser.userId}/${resetToken}">Reset Password</a></p><br>
+      <p><a href="${process.env.CLIENT_URL}/reset-password/${existingUser.userId}/${resetToken}">Reset Password</a></p><br>
       <p>If you did not request this, please ignore this email.</p>
       <p>Thank you!</p>
     `,

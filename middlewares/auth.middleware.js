@@ -68,7 +68,7 @@ export const verifyUserAuthorization = async (req, res, next) => {
       process.env.JWT_ACCESS_SECRET_KEY
     );
 
-    const existingUser = await UserModel.findById(decodedToken._id);
+    const existingUser = await UserModel.findById(decodedToken.id);
     if (!existingUser) {
       return res.status(404).send({
         data: null,

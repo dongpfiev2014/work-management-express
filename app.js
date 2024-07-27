@@ -8,7 +8,6 @@ import {
   verifyUserAuthentication,
   verifyUserAuthorization,
 } from "./middlewares/auth.middleware.js";
-import { getAdminPage } from "./controllers/user.controller.js";
 import cors from "cors";
 import profileRouter from "./routes/profile.route.js";
 import companyRouter from "./routes/company.route.js";
@@ -58,7 +57,7 @@ app.use(
 app.use("/api/v1/auth", authRouter);
 
 app.use(verifyUserAuthentication);
-app.use("/api/v1/users", userRouter);
+app.use("/api/v1/users", verifyUserAuthorization, userRouter);
 app.use("/api/v1/profile", profileRouter);
 app.use("/api/v1/company", companyRouter);
 app.use("/api/v1/request", requestRouter);
@@ -67,7 +66,6 @@ app.use("/api/v1/departments", departmentRouter);
 app.use("/api/v1/projects", projectRouter);
 app.use("/api/v1/tasks", taskRouter);
 app.use("/api/v1/comments", commentRouter);
-app.get("/api/v1/admin", verifyUserAuthorization, getAdminPage);
 
 const port = process.env.PORT || 4000;
 

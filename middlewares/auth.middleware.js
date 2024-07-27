@@ -77,7 +77,7 @@ export const verifyUserAuthorization = async (req, res, next) => {
       });
     }
 
-    const isAdmin = existingUser.role.includes("admin");
+    const isAdmin = existingUser.userRole.includes("admin");
     if (!isAdmin) {
       return res.status(403).send({
         data: null,

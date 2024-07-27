@@ -38,32 +38,3 @@ export const getUserById = async (req, res) => {
     });
   }
 };
-
-export const changePassword = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const { password } = req.body;
-    const currentUser = await UsersModel.findById(userId);
-    if (!currentUser) throw new Error("User is not exists!");
-    currentUser.password = password;
-    await currentUser.save();
-    res.status(201).send({
-      message: "Updated password!",
-      success: true,
-      data: currentUser,
-    });
-  } catch (error) {
-    res.status(403).send({
-      message: error.message,
-      data: null,
-      success: false,
-    });
-  }
-};
-
-export const getAdminPage = async (req, res) => {
-  res.status(200).send({
-    message: "Admin page",
-    success: true,
-  });
-};

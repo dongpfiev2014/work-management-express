@@ -412,7 +412,7 @@ export const refreshToken = async (req, res) => {
       secure: process.env.NODE_ENV === "production" ? true : false,
     });
     const refreshToken = cookies.get("refreshToken", { signed: true });
-    console.log("refreshToken");
+    console.log(refreshToken);
     if (!refreshToken) {
       return res.status(403).send({
         message: "No refresh token found",

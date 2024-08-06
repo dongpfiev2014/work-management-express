@@ -24,35 +24,38 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+const isProduction = process.env.NODE_ENV === "production";
+
+const allowedOrigins = isProduction
+  ? [process.env.PROD_CLIENT_URL]
+  : [process.env.DEV_CLIENT_URL];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: [
+    "Origin",
+    "X-Requested-With",
+    "Content-Type",
+    "Authorization",
+  ],
+  credentials: true,
+};
 
 const io = new Server(server, {
-  cors: {
-    origin: `${process.env.CLIENT_URL}`,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: [
-      "Origin",
-      "X-Requested-With",
-      "Content-Type",
-      "Authorization",
-    ],
-    credentials: true,
-  },
+  cors: corsOptions,
 });
 
 app.use(express.json());
-app.use(
-  cors({
-    origin: `${process.env.CLIENT_URL}`,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: [
-      "Origin",
-      "X-Requested-With",
-      "Content-Type",
-      "Authorization",
-    ],
-    credentials: true,
-  })
-);
+app.use(cors(corsOptions));
 
 app.use("/api/v1/auth", authRouter);
 

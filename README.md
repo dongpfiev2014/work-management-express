@@ -12,7 +12,7 @@ Work Management is a comprehensive project management application designed to st
 
 ## Technologies Used
 
-- **Frontend**: React, Redux Toolkit, Ant Design, Bootstrap
+- **Frontend**: NextJS, Redux Toolkit, Ant Design, Bootstrap
 - **Backend**: Express.js, Socket.IO, Node.js
 - **Database**: MongoDB
 - **Authentication**: JWT, bcrypt
@@ -53,5 +53,5 @@ To run the project locally, follow these steps:
 
 For any questions or suggestions, please reach out to:
 
-Name: Khổng Minh Đông
-Email: dongpfiev2014@gmail.com
+- Name: Khổng Minh Đông
+- Email: dongpfiev2014@gmail.com

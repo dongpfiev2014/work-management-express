@@ -19,6 +19,7 @@ import departmentRouter from "./routes/department.route.js";
 import projectRouter from "./routes/projects.route.js";
 import taskRouter from "./routes/task.route.js";
 import commentRouter from "./routes/comment.route.js";
+import testRouter from "./routes/test.route.js";
 
 dotenv.config();
 
@@ -40,7 +41,7 @@ const corsOptions = {
       return callback(new Error("Not allowed by CORS"));
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
   allowedHeaders: [
     "Origin",
     "X-Requested-With",
@@ -57,6 +58,7 @@ const io = new Server(server, {
 app.use(express.json());
 app.use(cors(corsOptions));
 
+app.use("/api/v1/test", testRouter);
 app.use("/api/v1/auth", authRouter);
 
 app.use(verifyUserAuthentication);

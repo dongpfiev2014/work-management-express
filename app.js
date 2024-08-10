@@ -20,6 +20,7 @@ import projectRouter from "./routes/projects.route.js";
 import taskRouter from "./routes/task.route.js";
 import commentRouter from "./routes/comment.route.js";
 import testRouter from "./routes/test.route.js";
+import messageRouter from "./routes/message.route.js";
 
 dotenv.config();
 
@@ -28,7 +29,7 @@ const server = http.createServer(app);
 const isProduction = process.env.NODE_ENV === "production";
 
 const allowedOrigins = isProduction
-  ? [process.env.PROD_CLIENT_URL]
+  ? [process.env.PROD_CLIENT_URL, process.env.PORTFOLIO_URL]
   : [process.env.DEV_CLIENT_URL];
 
 const corsOptions = {
@@ -60,6 +61,7 @@ app.use(cors(corsOptions));
 
 app.use("/api/v1/test", testRouter);
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/message", messageRouter);
 
 app.use(verifyUserAuthentication);
 app.use("/api/v1/users", verifyUserAuthorization, userRouter);
@@ -78,7 +80,9 @@ connectDB()
   .then(() => {
     server
       .listen(port, () => {
-        console.log(`Server is running on port ${port}`);
+        console.log(
+          `Server is running on port ${port} in ${process.env.NODE_ENV} environment`
+        );
       })
       .on("error", (err) => {
         console.error("Failed to start server:", err);
